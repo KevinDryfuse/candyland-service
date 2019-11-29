@@ -1,64 +1,75 @@
-from flask import Flask
-from flask_web.enums.Character import Character
-from flask_web.enums.CardType import CardType
-from flask_web.enums.ColorCount import ColorCount
-from flask_web.enums.Color import Color
-from flask_web.domains.Card import Card
-from flask_web.domains.Deck import Deck
 import sys
+
+from flask import Flask
+
+from flask_web.domains.Board import Board
+from flask_web.domains.Deck import Deck
+from flask_web.domains.Player import Player
+from flask_web.domains.Players import Players
+from flask_web.enums.Type import Type
 
 app = Flask(__name__)
 
-
+# TODO: Add in functionality for 'shortcuts'
+# TODO: Add in functionality for 'lose a turn'
+# TODO: Add in functionality for 'double colors'
+# TODO: Get this in a position where is can play n number of games
+# TODO: Add endpoints to setup a game instead of the hardcoded values
+# TODO: Add some visuals and track statistics
+# TODO: All the things
 @app.route('/')
-def hello_world():
+def main():
+
+    board = Board()
 
     deck = Deck()
-
-    deck.shuffle()
-
-    for card in deck:
-        print(card.get_card_info(), file=sys.stderr)
-
-    deck.shuffle()
-
-    print('SHUFFLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - ' + str(len(deck.cards)), file=sys.stderr)
-
-    for card in deck:
-        print(card.get_card_info(), file=sys.stderr)
-
-    number_of_players = 3
-
-    i = 1
+    players = Players()
+    players.add_player(Player('Ellison'))
+    players.add_player(Player('Gina'))
+    players.add_player(Player('Kevin'))
     turn = 1
-    while i <= number_of_players:
+    there_is_a_winner = False
 
-        print(i)
-        print('Player ' + str(i) + ' is on turn number ' + str(turn))
+    player_iterator = 0
 
-        # Logic goes here!
-        # Load a board (ordered list of somesort)
+    # TODO: Make this WAAAAAY cleaner
+    while player_iterator <= (players.get_total_players() - 1):
+        player = players.get_player(player_iterator)
+        card = deck.take()
+        print('Player ' + player.name + ' is on turn number ' + str(turn) + ' and took card ' + card.get_card_info(), file=sys.stderr)
+        print('Starting from position ' + str(player.position) + ' which is ' + board.get_space(player.position).get_space_info(), file=sys.stderr)
+        print('There are ' + str(board.get_number_of_spaces() - player.position) + ' spaces remaining until this player wins!', file=sys.stderr)
 
+        if card.card_type == Type.character:
+            player.set_position(0)
 
+        while player.position <= board.get_number_of_spaces():
+            player.set_position(player.position + 1)
+            print('There are ' + str(board.get_number_of_spaces() - player.position) + ' spaces remaining until this player wins!', file=sys.stderr)
+            if player.position >= board.get_number_of_spaces():
+                print('PLAYER ' + player.name + ' HAS WON!', file=sys.stderr)
+                there_is_a_winner = True
+                break
 
+            space = board.get_space(player.position)
 
+            if card.card_type == Type.color:
+                if (space.space_type == Type.color) & (space.color == card.color):
+                    print('Player ' + player.name + ' has landed on space ' + space.color.name + '!', file=sys.stderr)
+                    break
+            elif card.card_type == Type.character:
+                if (space.space_type == Type.character) & (space.character == card.character):
+                    print('Player ' + player.name + ' has landed on space ' + space.character.name + '!', file=sys.stderr)
+                    break
 
+        player_iterator += 1
+        if player_iterator > (players.get_total_players() - 1):
+            turn += 1
+            player_iterator = 0
+        if there_is_a_winner:
+            break
 
-
-
-        i += 1
-        turn += 1
-        if i > number_of_players:
-            i = 1
-        if turn > 100:
-            i = number_of_players + 1
-
-    card = Card(card_type=CardType.character,
-                color=Color.none,
-                color_count=ColorCount.none,
-                character=Character.gramma_nutt)
-
-    return 'Hey, we have Flask in a Docker container! ' + card.get_card_info()
+    return 'Hey, we have Flask in a Docker container!'
 
 
 if __name__ == '__main__':

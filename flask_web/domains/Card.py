@@ -1,5 +1,5 @@
 from flask_web.enums.Character import Character
-from flask_web.enums.CardType import CardType
+from flask_web.enums.Type import Type
 from flask_web.enums.ColorCount import ColorCount
 from flask_web.enums.Color import Color
 
@@ -9,7 +9,7 @@ class Card:
     def __init__(self, card_type, color, color_count, character):
         self.card_type = card_type
 
-        if card_type == CardType.character:
+        if card_type == Type.character:
             if character == Character.none:
                 raise ValueError('A character is not specified for a character type card!')
 
@@ -39,7 +39,7 @@ class Card:
         return self.character
 
     def get_card_info(self):
-        if self.card_type == CardType.character:
+        if self.card_type == Type.character:
             card_info = self.character.value
         else:
             if self.color_count == ColorCount.double:
