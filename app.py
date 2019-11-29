@@ -10,7 +10,6 @@ from flask_web.enums.Type import Type
 
 app = Flask(__name__)
 
-# TODO: Add in functionality for 'shortcuts'
 # TODO: Add in functionality for 'lose a turn'
 # TODO: Add in functionality for 'double colors'
 # TODO: Get this in a position where is can play n number of games
@@ -56,6 +55,10 @@ def main():
             if card.card_type == Type.color:
                 if (space.space_type == Type.color) & (space.color == card.color):
                     print('Player ' + player.name + ' has landed on space ' + space.color.name + '!', file=sys.stderr)
+                    if (space.skip_ahead != None):
+                        skip_to = (player.position + space.skip_ahead)
+                        print('Player ' + player.name + ' is skipping to space ' + str(skip_to) + '!', file=sys.stderr)
+                        player.set_position(skip_to)
                     break
             elif card.card_type == Type.character:
                 if (space.space_type == Type.character) & (space.character == card.character):
