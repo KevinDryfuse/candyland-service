@@ -6,11 +6,11 @@ from flask_web.domains.Board import Board
 from flask_web.domains.Deck import Deck
 from flask_web.domains.Player import Player
 from flask_web.domains.Players import Players
+from flask_web.enums.ColorCount import ColorCount
 from flask_web.enums.Type import Type
 
 app = Flask(__name__)
 
-# TODO: Add in functionality for 'double colors'
 # TODO: Get this in a position where is can play n number of games
 # TODO: Add endpoints to setup a game instead of the hardcoded values
 # TODO: Add some visuals and track statistics
@@ -46,6 +46,11 @@ def main():
             if card.card_type == Type.character:
                 player.set_position(0)
 
+            if card.color_count == ColorCount.double:
+                moves_remaining = 1
+            else:
+                moves_remaining = 0
+
             while player.position <= board.get_number_of_spaces():
                 player.set_position(player.position + 1)
                 print('There are ' + str(board.get_number_of_spaces() - player.position) + ' spaces remaining until this player wins!', file=sys.stderr)
@@ -66,7 +71,12 @@ def main():
                         if (space.lose_a_turn):
                             print('Player ' + player.name + ' has lost a turn!', file=sys.stderr)
                             player.set_lose_a_turn_flag(True)
-                        break
+                        if moves_remaining == 0:
+                            break
+
+                        moves_remaining = 0
+                        print('Player ' + player.name + ' thinks moving twice is twice as nice!', file=sys.stderr)
+
                 elif card.card_type == Type.character:
                     if (space.space_type == Type.character) & (space.character == card.character):
                         print('Player ' + player.name + ' has landed on space ' + space.character.name + '!', file=sys.stderr)
