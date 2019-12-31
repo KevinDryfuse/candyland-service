@@ -1,9 +1,17 @@
+from flask_web.domains.Player import Player
+
 
 class Players:
 
     def __init__(self):
         self.i = 0
         self.players = []
+
+    def __init__(self, players):
+        self.i = 0
+        self.players = []
+        for player in players.split(","):
+            self.add_player(Player(player))
 
     def __iter__(self):
         return self
