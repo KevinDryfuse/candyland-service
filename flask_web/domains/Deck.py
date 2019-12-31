@@ -36,7 +36,7 @@ class Deck:
         self.cards.append(card)
 
     def shuffle(self):
-        print('SHUFFLE!!!', file=sys.stderr)
+        # print('SHUFFLE!!!', file=sys.stderr)
         random.shuffle(self.cards)
 
     def number_of_cards(self):
